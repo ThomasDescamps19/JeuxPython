@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Devin</title>
+</head>
+<body>
+
+<h1>Jeu de Devin</h1>
+<p id="result"></p>
+<input type="number" id="userInput" placeholder="Propose un nombre entre 1 et 100">
+<button onclick="checkGuess()">Proposer</button>
+<button onclick="resetGame()">Recommencer</button>
+
+<script>
+    function resetGame() {
+        // Appel à la nouvelle route Flask pour réinitialiser le jeu
+        fetch('/reset_game')
+            .then(response => response.json())
+            .then(data => {
+                // Réinitialisation de l'interface utilisateur
+                document.getElementById("userInput").value = "";
+                document.getElementById("result").textContent = "";
+                document.getElementById("userInput").disabled = false;
+            });
+    }
+
+    function checkGuess() {
+        var userInput = document.getElementById("userInput").value;
+        var resultParagraph = document.getElementById("result");
+
+        // Envoi du nombre proposé au serveur Flask
+        fetch('/check_guess?user_input=' + userInput)
+            .then(response => response.text())
+            .then(result => {
+                resultParagraph.textContent = result;
+
+                if (result === 'Correct !') {
+                    // Le jeu est terminé, vous pouvez effectuer d'autres actions ici si nécessaire.
+                    document.getElementById("userInput").disabled = true;
+                }
+            });
+    }
+
+    // Appel à la fonction resetGame au chargement de la page pour initialiser le jeu
+    window.onload = resetGame;
+</script>
+
+</body>
+</html>
